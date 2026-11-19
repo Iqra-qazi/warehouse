@@ -2,7 +2,6 @@ import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import protect from "./middlewares/auth.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import productRoutes from "./routes/product.routes.js";
@@ -46,7 +45,7 @@ app.use((req, res, next) => {
 });
 app.use(cookieParser());
 
-app.get("/", protect, (req, res) => res.json({ message: "API running" }));
+app.get("/", (req, res) => res.json({ message: "API running" }));
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
