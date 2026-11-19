@@ -16,9 +16,29 @@ import transactionRoutes from "./routes/transaction.routes.js";
 import { errorHandler, notFound } from "./middlewares/error.js";
 
 const app = express();
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const clientUrlSetting =
+  process.env.CLIENT_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5173");
+const clientOrigins = clientUrlSetting
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
 
-app.use(cors({ origin: clientUrl, credentials: true }));
+if (clientOrigins.length === 0) {
+  throw new Error("CLIENT_URL must be configured for production.");
+}
+
+const corsOptions = {
+  origin(origin, callback) {
+    callback(null, Boolean(origin && clientOrigins.includes(origin)));
+  },
+  credentials: true,
+  methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 app.use((req, res, next) => {
   if (!req.body) req.body = {};
