@@ -1,7 +1,16 @@
 import axios from "axios";
 
+const configuredBaseURL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
+if (!configuredBaseURL) {
+  throw new Error("VITE_API_URL must be set to the backend deployment URL.");
+}
+
+const baseURL = /\/api$/i.test(configuredBaseURL)
+  ? configuredBaseURL
+  : `${configuredBaseURL}/api`;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL,
 });
 
 api.interceptors.request.use((config) => {
