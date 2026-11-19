@@ -1,0 +1,229 @@
+{
+  "info": {
+    "_postman_id": "36a4172d-2336-40b5-a5e8-b45dfc1c6b53",
+    "name": "Inventory & Warehouse Management API",
+    "description": "Set apiUrl, log in to store token, then fill resource IDs for dependent requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "apiUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "warehouseId", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "supplierId", "value": "" },
+    { "key": "orderId", "value": "" },
+    { "key": "supplyRequestId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health (public)",
+      "request": {
+        "method": "GET",
+        "url": "{{apiUrl}}/health"
+      }
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set('token', pm.response.json().token);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\"\n}"
+        },
+        "url": "{{apiUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Users (admin)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/users"
+      }
+    },
+    {
+      "name": "Create supplier",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Demo Supplier\",\n  \"email\": \"supplier-demo@example.com\",\n  \"password\": \"DemoPass123\",\n  \"role\": \"supplier\",\n  \"companyName\": \"Demo Supplies\"\n}"
+        },
+        "url": "{{apiUrl}}/users"
+      }
+    },
+    {
+      "name": "Supplier list (admin)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/users/suppliers?page=1&limit=10"
+      }
+    },
+    {
+      "name": "Warehouse options",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/warehouses/options"
+      }
+    },
+    {
+      "name": "Create warehouse",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"API Demo Warehouse\",\n  \"location\": \"Central District\",\n  \"capacity\": 1000\n}"
+        },
+        "url": "{{apiUrl}}/warehouses"
+      }
+    },
+    {
+      "name": "Products",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/products?page=1&limit=10"
+      }
+    },
+    {
+      "name": "Stock in",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product\": \"{{productId}}\",\n  \"warehouse\": \"{{warehouseId}}\",\n  \"quantity\": 20,\n  \"note\": \"Postman demo stock-in\"\n}"
+        },
+        "url": "{{apiUrl}}/stock/in"
+      }
+    },
+    {
+      "name": "Stock out",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product\": \"{{productId}}\",\n  \"warehouse\": \"{{warehouseId}}\",\n  \"quantity\": 3,\n  \"note\": \"Postman demo stock-out\"\n}"
+        },
+        "url": "{{apiUrl}}/stock/out"
+      }
+    },
+    {
+      "name": "Stock transactions",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/transactions?page=1&limit=10"
+      }
+    },
+    {
+      "name": "Low stock",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/stock/low?page=1&limit=10"
+      }
+    },
+    {
+      "name": "Create order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerName\": \"Demo Customer\",\n  \"customerPhone\": \"03001234567\",\n  \"warehouse\": \"{{warehouseId}}\",\n  \"products\": [\n    { \"product\": \"{{productId}}\", \"quantity\": 2 }\n  ]\n}"
+        },
+        "url": "{{apiUrl}}/orders"
+      }
+    },
+    {
+      "name": "Orders",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/orders?page=1&limit=10"
+      }
+    },
+    {
+      "name": "Process order (admin or assigned manager)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"status\": \"Processing\"\n}" },
+        "url": "{{apiUrl}}/orders/{{orderId}}/status"
+      }
+    },
+    {
+      "name": "Create supply request (supplier)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product\": \"{{productId}}\",\n  \"warehouse\": \"{{warehouseId}}\",\n  \"quantity\": 5,\n  \"note\": \"Postman demo request\"\n}"
+        },
+        "url": "{{apiUrl}}/supply-requests"
+      }
+    },
+    {
+      "name": "Approve supply request (admin or assigned manager)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"status\": \"Approved\",\n  \"reviewNote\": \"Verified\"\n}" },
+        "url": "{{apiUrl}}/supply-requests/{{supplyRequestId}}/status"
+      }
+    },
+    {
+      "name": "Admin dashboard",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{apiUrl}}/dashboard/stats"
+      }
+    }
+  ]
+}

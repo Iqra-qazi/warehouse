@@ -1,0 +1,255 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-app-bg: var(--app-bg);
+  --color-app-surface: var(--app-surface);
+  --color-app-subtle: var(--app-subtle);
+  --color-app-border: var(--app-border);
+  --color-app-text: var(--app-text);
+  --color-app-muted: var(--app-muted);
+  --color-accent: var(--app-accent);
+  --color-accent-soft: var(--app-accent-soft);
+  --color-accent-hover: var(--app-accent-hover);
+  --color-accent-contrast: var(--app-accent-contrast);
+  --color-success: var(--status-success);
+  --color-success-soft: var(--status-success-soft);
+  --color-warning: var(--status-warning);
+  --color-warning-soft: var(--status-warning-soft);
+  --color-warning-border: var(--status-warning-border);
+  --color-danger: var(--status-danger);
+  --color-danger-soft: var(--status-danger-soft);
+  --color-danger-contrast: var(--status-danger-contrast);
+  --color-info: var(--status-info);
+  --color-info-soft: var(--status-info-soft);
+  --color-danger-solid: var(--status-danger-solid);
+  --color-overlay: var(--app-overlay);
+  --color-palette-ocean: var(--palette-ocean);
+  --color-palette-slate: var(--palette-slate);
+  --color-palette-dusty: var(--palette-dusty);
+  --color-palette-coral: var(--palette-coral);
+  --color-palette-vibrant: var(--palette-vibrant);
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: light;
+  --palette-ocean: #1384a3;
+  --palette-slate: #8a9ba8;
+  --palette-dusty: #d6afb2;
+  --palette-coral: #ff9a94;
+  --palette-vibrant: #ff6f83;
+  --app-bg: #f5f8fa;
+  --app-surface: #ffffff;
+  --app-subtle: #edf2f5;
+  --app-border: #d3dee4;
+  --app-text: #1b3040;
+  --app-muted: #667b88;
+  --app-accent: var(--palette-ocean);
+  --app-accent-soft: #e4f2f6;
+  --app-accent-hover: #0e6f89;
+  --app-accent-contrast: #ffffff;
+  --app-overlay: rgb(20 43 57 / 52%);
+  --status-success: #126f88;
+  --status-success-soft: #e4f2f6;
+  --status-warning: #583039;
+  --status-warning-soft: var(--palette-dusty);
+  --status-warning-border: var(--palette-coral);
+  --status-danger: #a9364d;
+  --status-danger-soft: #fff0f2;
+  --status-danger-solid: var(--palette-vibrant);
+  --status-danger-contrast: #451a24;
+  --status-info: #627987;
+  --status-info-soft: #edf2f5;
+}
+
+.dark {
+  color-scheme: dark;
+  --app-bg: #14232c;
+  --app-surface: #1d303b;
+  --app-subtle: #263b47;
+  --app-border: #3b525e;
+  --app-text: #edf4f6;
+  --app-muted: #a9bac2;
+  --app-accent: var(--palette-ocean);
+  --app-accent-soft: #193d4a;
+  --app-accent-hover: #0e6f89;
+  --app-accent-contrast: #ffffff;
+  --app-overlay: rgb(5 17 24 / 76%);
+  --status-success: #6bb5c7;
+  --status-success-soft: #193d4a;
+  --status-warning: var(--palette-coral);
+  --status-warning-soft: #443438;
+  --status-warning-border: #b86165;
+  --status-danger: #ff9a94;
+  --status-danger-soft: #4a2d37;
+  --status-danger-solid: #ff6f83;
+  --status-danger-contrast: #451a24;
+  --status-info: #b0c1ca;
+  --status-info-soft: #293d47;
+}
+
+html {
+  min-width: 320px;
+  background: var(--app-bg);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes app-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.app-toast {
+  position: relative;
+  overflow: hidden;
+  padding-left: 14px !important;
+}
+
+.app-toast::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--app-accent);
+  content: "";
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-fade-in {
+    animation: app-fade-in 180ms ease-out both;
+  }
+
+  .app-auth-card {
+    animation: app-rise-in 380ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .app-pop-in {
+    animation: app-pop-in 150ms ease-out both;
+  }
+
+  .app-section-enter {
+    animation: app-rise-in 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .app-stat-card {
+    transition: border-color 160ms ease, box-shadow 160ms ease, translate 160ms ease;
+    animation: app-fade-in 260ms ease-out both;
+  }
+
+  a:hover .app-stat-card {
+    translate: 0 -3px;
+    border-color: var(--app-accent);
+    box-shadow: 0 8px 18px rgb(23 43 64 / 9%);
+  }
+
+  .app-product-card {
+    transition: border-color 160ms ease, box-shadow 160ms ease, translate 160ms ease;
+  }
+
+  .app-product-card:hover {
+    translate: 0 -3px;
+    border-color: var(--app-accent);
+    box-shadow: 0 8px 18px rgb(23 43 64 / 9%);
+  }
+
+  .app-button {
+    transition: translate 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  }
+
+  .app-button:hover:not(:disabled) {
+    translate: 0 -2px;
+    box-shadow: 0 4px 10px rgb(20 65 78 / 20%);
+  }
+
+  button:not(:disabled) {
+    transition: translate 140ms ease, background-color 140ms ease, border-color 140ms ease;
+  }
+
+  button:not(:disabled):hover {
+    translate: 0 -1px;
+  }
+
+  button:not(:disabled):active {
+    translate: 0 0;
+  }
+}
+
+button:not(:disabled),
+a[href],
+select:not(:disabled),
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
+button.bg-accent:not(:disabled):hover {
+  background-color: var(--app-accent-hover);
+}
+
+button.bg-danger-solid:not(:disabled):hover {
+  filter: brightness(0.94);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--app-accent-soft);
+  color: var(--app-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
