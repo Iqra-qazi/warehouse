@@ -243,10 +243,10 @@ Import [`postman_collection.json`](./postman_collection.json) into Postman. The 
 ### Backend on Vercel
 
 1. Import the repository and set Root Directory to `Backend`.
-2. Set `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, and any ImageKit variables used by the app. Set `USE_MONGO_TRANSACTIONS=true` for a replica-set database.
+2. Set `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL=https://warehouse-three-phi.vercel.app`, and any ImageKit variables used by the app. Set `USE_MONGO_TRANSACTIONS=true` for a replica-set database. Set `FRONTEND_URL` on the backend project for the deployment environment in use (Production, or Preview when testing a preview deployment); use the exact origin with no path or quotes.
 3. Assign the backend project a stable production domain in **Settings → Domains**. Use that domain in the frontend configuration, not a deployment-specific URL.
-4. If the browser receives a redirect for an `OPTIONS` request, check **Settings → Deployment Protection** and disable **Vercel Authentication** for the public production API deployment.
-5. Test `https://<backend-production-domain>/api/health` and the CORS preflight command below.
+4. If `OPTIONS` returns `200` with `Allow: POST` but no CORS headers, the Express CORS origin callback did not match the request's `Origin`. Check that the backend deployment received the correct `FRONTEND_URL`. A redirect to `https://vercel.com/sso-api` instead indicates Vercel Authentication/Deployment Protection; disable **Vercel Authentication** under **Settings → Deployment Protection** for the public API deployment.
+5. Redeploy the backend after changing settings or environment variables. Test `https://<backend-production-domain>/api/health` and the CORS preflight command below.
 
 ### Frontend on Vercel
 
@@ -272,9 +272,9 @@ curl -i -X OPTIONS "https://<backend-production-domain>/api/auth/login" \
   -H "Access-Control-Request-Headers: authorization,content-type"
 ```
 
-The response should be `204` (or another successful 2xx response), include
+The response should be `204`, include
 `Access-Control-Allow-Origin: https://warehouse-three-phi.vercel.app`,
-`Access-Control-Allow-Credentials: true`, and must not redirect.
+and must not redirect. Credentialed cookies are not enabled; the frontend uses bearer tokens.
 
 ## Known limitations
 

@@ -35,23 +35,30 @@ test("health endpoint responds without database access", async () => {
   assert.deepEqual(await response.json(), { status: "ok" });
 });
 
-test("login preflight allows requests from any origin", async () => {
-  for (const origin of ["http://localhost:5173", "https://any-origin.example"]) {
-    const response = await fetch(`${baseUrl}/api/auth/login`, {
-      method: "OPTIONS",
-      headers: {
-        Origin: origin,
-        "Access-Control-Request-Method": "POST",
-        "Access-Control-Request-Headers": "authorization,content-type",
-      },
-    });
+test("login preflight permits the configured origin and rejects other origins", async () => {
+  const allowedResponse = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "OPTIONS",
+    headers: {
+      Origin: "http://localhost:5173",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "authorization,content-type",
+    },
+  });
 
-    assert.equal(response.status, 204);
-    assert.equal(response.headers.get("access-control-allow-origin"), "*");
-    assert.equal(response.headers.get("access-control-allow-credentials"), null);
-    assert.match(response.headers.get("access-control-allow-methods"), /POST/);
-    assert.match(response.headers.get("access-control-allow-headers"), /Authorization/i);
-  }
+  assert.equal(allowedResponse.status, 204);
+  assert.equal(allowedResponse.headers.get("access-control-allow-origin"), "http://localhost:5173");
+  assert.equal(allowedResponse.headers.get("access-control-allow-credentials"), null);
+  assert.match(allowedResponse.headers.get("access-control-allow-methods"), /POST/);
+  assert.match(allowedResponse.headers.get("access-control-allow-headers"), /Authorization/i);
+
+  const deniedResponse = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "OPTIONS",
+    headers: {
+      Origin: "https://untrusted.example",
+      "Access-Control-Request-Method": "POST",
+    },
+  });
+  assert.equal(deniedResponse.headers.get("access-control-allow-origin"), null);
 });
 
 test("root endpoint rejects requests without credentials", async () => {
