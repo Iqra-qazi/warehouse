@@ -26,7 +26,12 @@ export default function Login() {
       toast.success("Login successful");
       navigate(getDashboardPath(loggedInUser.role), { replace: true });
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || "Unable to log in");
+      const message = error?.response?.data?.message
+        || (error?.request
+          ? "Unable to reach the server. Check your connection and API URL, then try again."
+          : error?.message)
+        || "Unable to log in. Please try again.";
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

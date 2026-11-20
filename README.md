@@ -69,7 +69,7 @@ frontend/
    | `MONGO_URI` | MongoDB connection string |
    | `JWT_SECRET` | Long, random JWT signing secret |
    | `JWT_EXPIRES_IN` | JWT lifetime, for example `1h` or `1d` |
-   | `CLIENT_URL` | Exact frontend origin allowed by CORS, e.g. `http://localhost:5173` |
+   | `FRONTEND_URL` | Exact frontend origin allowed by CORS, e.g. `http://localhost:5173` |
    | `IMAGEKIT_PUBLIC_KEY` | ImageKit public key |
    | `IMAGEKIT_PRIVATE_KEY` | ImageKit private key; backend only |
    | `IMAGEKIT_URL_ENDPOINT` | ImageKit HTTPS URL endpoint |
@@ -230,30 +230,51 @@ Import [`postman_collection.json`](./postman_collection.json) into Postman. The 
 
 1. Create a Web Service from the repository and set the Root Directory to `Backend`.
 2. Build command: `npm install`. Start command: `npm start` (`node server.js`).
-3. Configure `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLIENT_URL`, ImageKit variables, and `USE_MONGO_TRANSACTIONS=true`. Use Render's assigned `PORT` if supplied.
+3. Configure `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, ImageKit variables, and `USE_MONGO_TRANSACTIONS=true`. Use Render's assigned `PORT` if supplied.
 4. In Atlas, allow the backend service's outbound IP addresses (or the provider's documented egress range) and verify the database user has only required database access.
 
 ### Backend on Railway
 
 1. Create a Railway service from the repository; set the service Root Directory to `Backend` if needed.
 2. Use `npm install` for install and `npm start` as the start command.
-3. Set the same backend environment variables. Set `CLIENT_URL` to the deployed frontend's exact HTTPS origin.
+3. Set the same backend environment variables. Set `FRONTEND_URL` to the deployed frontend's exact HTTPS origin.
 4. Allow Railway's outbound network path in Atlas and test `/api/health`.
+
+### Backend on Vercel
+
+1. Import the repository and set Root Directory to `Backend`.
+2. Set `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, and any ImageKit variables used by the app. Set `USE_MONGO_TRANSACTIONS=true` for a replica-set database.
+3. Assign the backend project a stable production domain in **Settings → Domains**. Use that domain in the frontend configuration, not a deployment-specific URL.
+4. If the browser receives a redirect for an `OPTIONS` request, check **Settings → Deployment Protection** and disable **Vercel Authentication** for the public production API deployment.
+5. Test `https://<backend-production-domain>/api/health` and the CORS preflight command below.
 
 ### Frontend on Vercel
 
 1. Import the repository and set Root Directory to `frontend`.
 2. Framework: Vite; build command: `npm run build`; output directory: `dist`.
-3. Set `VITE_API_URL=https://<your-backend-host>/api` in the Vercel environment and redeploy; Vite variables are embedded at build time.
+3. Set `VITE_API_URL=https://<backend-production-domain>/api` in the Vercel environment and redeploy; Vite variables are embedded at build time.
 4. `frontend/vercel.json` rewrites client routes to `index.html`, so refreshing a route such as `/admin/users` works.
 
 ### Frontend on Netlify
 
 1. Import the repository and set Base directory to `frontend`, build command to `npm run build`, and publish directory to `dist`.
-2. Set `VITE_API_URL=https://<your-backend-host>/api`, then redeploy.
+2. Set `VITE_API_URL=https://<backend-production-domain>/api`, then redeploy.
 3. Add a Netlify SPA redirect (`/* /index.html 200`) if using Netlify instead of the included Vercel rewrite.
 
-For Atlas deployments, `USE_MONGO_TRANSACTIONS=true` is recommended because Atlas is a replica set. `CLIENT_URL` must be the frontend origin, not the backend URL.
+For Atlas deployments, `USE_MONGO_TRANSACTIONS=true` is recommended because Atlas is a replica set. `FRONTEND_URL` must be the frontend origin, not the backend URL.
+
+To verify CORS after deploying, run:
+
+```sh
+curl -i -X OPTIONS "https://<backend-production-domain>/api/auth/login" \
+  -H "Origin: https://warehouse-three-phi.vercel.app" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: authorization,content-type"
+```
+
+The response should be `204` (or another successful 2xx response), include
+`Access-Control-Allow-Origin: https://warehouse-three-phi.vercel.app`,
+`Access-Control-Allow-Credentials: true`, and must not redirect.
 
 ## Known limitations
 

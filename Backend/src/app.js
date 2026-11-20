@@ -15,21 +15,21 @@ import transactionRoutes from "./routes/transaction.routes.js";
 import { errorHandler, notFound } from "./middlewares/error.js";
 
 const app = express();
-const clientUrlSetting =
-  process.env.CLIENT_URL ||
+const frontendUrlSetting =
+  process.env.FRONTEND_URL ||
   (process.env.NODE_ENV === "production" ? "" : "http://localhost:5173");
-const clientOrigins = clientUrlSetting
+const frontendOrigins = frontendUrlSetting
   .split(",")
   .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
-if (clientOrigins.length === 0) {
-  throw new Error("CLIENT_URL must be configured for production.");
+if (frontendOrigins.length === 0) {
+  throw new Error("FRONTEND_URL must be configured for production.");
 }
 
 const corsOptions = {
   origin(origin, callback) {
-    callback(null, Boolean(origin && clientOrigins.includes(origin)));
+    callback(null, Boolean(origin && frontendOrigins.includes(origin)));
   },
   credentials: true,
   methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -37,6 +37,7 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
+app.options(/.*/, cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 app.use((req, res, next) => {

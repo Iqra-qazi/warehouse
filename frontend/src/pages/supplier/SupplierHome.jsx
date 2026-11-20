@@ -73,7 +73,7 @@ export default function SupplierHome() {
               <tr className="text-app-text" key={request._id}><td className="px-3 py-3">{request.product?.name || "—"}</td><td className="px-3 py-3">{request.warehouse?.name || "—"}</td><td className="px-3 py-3 tabular-nums">{formatNumber(request.quantity ?? 0)}</td><td className="px-3 py-3"><StatusBadge status={request.status} /></td><td className="px-3 py-3">{formatDate(request.createdAt)}</td></tr>
             ))}</tbody>
           </table>
-          {!loading && !stats.recentRequests.length && <EmptyState message="You have not submitted any supply requests yet." />}
+          {!loading && (stats.recentRequests?.length ?? 0) === 0 && <EmptyState message="You have not submitted any supply requests yet." />}
         </div>
       </section>
     </div>

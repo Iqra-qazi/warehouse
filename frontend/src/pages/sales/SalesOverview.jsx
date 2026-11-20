@@ -95,7 +95,7 @@ export default function SalesOverview() {
                   <td className="px-3 py-3"><StatusBadge status={order.status} /></td><td className="px-3 py-3">{formatDate(order.createdAt)}</td>
                 </tr>
               ))}
-              {!loading && !overview.recentOrders.length && <tr><td colSpan="5" className="px-3 py-8 text-center text-app-muted">No recent orders</td></tr>}
+              {!loading && (overview.recentOrders?.length ?? 0) === 0 && <tr><td colSpan="5" className="px-3 py-8 text-center text-app-muted">No recent orders</td></tr>}
             </tbody>
           </table>
         </div>

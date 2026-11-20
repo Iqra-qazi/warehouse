@@ -2,7 +2,7 @@ import axios from "axios";
 
 const configuredBaseURL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, "");
 if (!configuredBaseURL) {
-  throw new Error("VITE_API_URL must be set to the backend deployment URL.");
+  throw new Error("VITE_API_URL must be set to the stable backend URL.");
 }
 
 const baseURL = /\/api$/i.test(configuredBaseURL)
